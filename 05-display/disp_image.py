@@ -2,12 +2,23 @@ import argparse
 import time
 
 import serial
-import serial.tools.list_ports
 from PIL import Image
+
+try:
+	import serial.tools.list_ports
+except ModuleNotFoundError:
+	list_ports = None
+else:
+	list_ports = serial.tools.list_ports
 
 
 def print_ports():
-	ports = list(serial.tools.list_ports.comports())
+	if list_ports is None:
+		print("COM port list is unavailable. Install pyserial in this venv:")
+		print("  python -m pip install pyserial")
+		return
+
+	ports = list(list_ports.comports())
 	if len(ports) == 0:
 		print("No COM ports found")
 		return
@@ -27,6 +38,11 @@ def main():
 
 	try:
 		ser = serial.Serial(port=args.port, baudrate=115200, timeout=0.1)
+	except AttributeError:
+		print("Wrong serial module is installed. Install pyserial in this venv:")
+		print("  python -m pip uninstall serial")
+		print("  python -m pip install pyserial")
+		return
 	except serial.SerialException as error:
 		print(f"Could not open {args.port}: {error}")
 		print("Close PuTTY/VS Code serial monitor if it is using this port.")

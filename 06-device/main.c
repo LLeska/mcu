@@ -116,7 +116,7 @@ static float clamp_float(float value, float min_value, float max_value)
 
 static void display_task_init()
 {
-	spi_init(spi0, 62500000);
+	spi_init(spi0, 62500000*2);
 	gpio_set_function(ILI9341_PIN_MISO, GPIO_FUNC_SPI);
 	gpio_set_function(ILI9341_PIN_MOSI, GPIO_FUNC_SPI);
 	gpio_set_function(ILI9341_PIN_SCK, GPIO_FUNC_SPI);
@@ -174,10 +174,10 @@ static void draw_bar(uint16_t x, uint16_t y, uint16_t width, uint16_t height, fl
 {
 	float normalized = (clamp_float(value, min_value, max_value) - min_value) / (max_value - min_value);
 	uint16_t fill_width = (uint16_t)(normalized * width);
-	ili9341_draw_filled_rect(&ili9341_display, x, y, width, height, COLOR_BLACK);
 	ili9341_draw_rect(&ili9341_display, x, y, width, height, COLOR_WHITE);
 	if (fill_width > 2) {
 		ili9341_draw_filled_rect(&ili9341_display, x + 1, y + 1, fill_width - 2, height - 2, color);
+		ili9341_draw_filled_rect(&ili9341_display, width - (x + 1), y + 1, width - (fill_width - 2), height - 2, color);
 	}
 }
 
